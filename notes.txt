@@ -1,0 +1,38 @@
+
+ETHI committee ID is 56.
+
+Get all statements from ETHI in session 42-1:
+
+```
+SELECT * from hansards_statement
+  WHERE urlcache LIKE '/committees/ethics/42-1/%';
+```
+
+```
+SELECT * FROM hansards_statement
+  LEFT JOIN committees_committeemeeting
+    ON committees_committeemeeting.evidence_id = hansards_statement.document_id
+  WHERE
+    (committee_id = 56) AND
+    (session_id = '42-1');
+```
+
+Get all ETHI meetings in session 42-1:
+
+```
+SELECT * from committees_committeemeeting
+  WHERE
+    (committee_id = 56) AND
+    (session_id = '42-1');
+```
+
+
+Tables of interest:
+
+* `committees_committeemeeting` (`evidence_id` connects to `hansards_document.id`)
+* `hansards_document`
+* `hansards_statement` (`document_id` connects to `hansards_document.id`)
+
+So, we can get all the statements for ETHI meetings by connecting `hansards_statement.document_id` to `committees_committeemeeting.evidence_id`.
+
+
