@@ -32,7 +32,6 @@ ethi_statements <- statements %>%
     who_en,
     who_context_en,
     politician_id,
-    content_en,
     content_en_plaintext,
     statement_type,
     procedural,
@@ -41,3 +40,22 @@ ethi_statements <- statements %>%
     urlcache
   )
 
+ethi_mp_ids <- ethi_statements %>% select(member_id) %>% unique() %>% pull()
+
+ethi_mps <- mps %>% filter(id %in% ethi_mp_ids) %>% filter(! is.na(id))
+
+
+# just statements from ETHI meetings 96 and 97, on the Privacy in Digital Government Report
+ethi_statements_dig_gov_priv <- ethi_statements %>% filter(number %in% c(96, 97))
+
+# count of questions by MP
+ethi_statements %>% filter(
+    ! procedural,
+    ! is.na(member_id),
+    str_detect(content_en_plaintext, "\\?")
+  ) %>%
+  group_by(member_id) %>%
+  summarize(count = n()) %>%
+  inner_join(ethi_mps, by = c("member_id" = "id")) %>%
+  select(member_id, name, short_name_en, count) %>%
+  arrange(-count)
