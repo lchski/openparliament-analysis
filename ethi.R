@@ -55,7 +55,7 @@ ethi_statements %>% filter(
     str_detect(content_en_plaintext, "\\?")
   ) %>%
   group_by(member_id) %>%
-  summarize(count = n()) %>%
+  summarize(count = n(), avg = count / (ethi_statements %>% select(number) %>% unique() %>% count() %>% pull())) %>%
   inner_join(ethi_mps, by = c("member_id" = "id")) %>%
-  select(member_id, name, short_name_en, count) %>%
-  arrange(-count)
+  select(member_id, name, short_name_en, count, avg) %>%
+  arrange(-avg)
