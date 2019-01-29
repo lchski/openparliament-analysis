@@ -6,6 +6,8 @@ mps <- read_tsv("data/mps.tsv")
 
 statements <- read_tsv("data/42-1-ethi.tsv")
 
+cambridge_analytica_meetings <- read_csv("data/cambridge-analytica.csv")
+
 #statements <- statements %>%
 #  mutate(
 #    meeting_number = str_extract_all(urlcache, "/committees/ethics/42-1/([0-9]{1,3})/"),
@@ -50,27 +52,44 @@ ethi_mps <- mps %>% filter(id %in% ethi_mp_ids) %>% filter(! is.na(id))
 ethi_statements_dig_gov_priv <- ethi_statements %>% filter(number %in% c(96, 97))
 
 # count of questions by MP
-question_data_by_mp <- function(queried_statements) {
-  queried_statements %>% filter(
-    ! procedural,
+question_data_by_mp <- function(queried_statements, filename = "out") {
+  number_of_meetings <- (queried_statements %>% select(number) %>% unique() %>% count() %>% pull())
+  
+  print(number_of_meetings)
+  
+  questions <- queried_statements %>% filter(
+    procedural != "true",
     ! is.na(member_id),
     str_detect(content_en_plaintext, "\\?")
-  ) %>%
+  )
+  
+  out <- questions %>%
     group_by(member_id) %>%
-    summarize(count = n(), avg = count / (queried_statements %>% select(number) %>% unique() %>% count() %>% pull())) %>%
+    summarize(count = n(), avg = count / number_of_meetings) %>%
     inner_join(ethi_mps, by = c("member_id" = "id")) %>%
     select(member_id, name, short_name_en, count, avg) %>%
     arrange(-avg)
+  
+  out %>% write_csv(paste0("data/out/", filename, ".csv"))
+  
+  questions %>% write_csv(paste0("data/out/", filename, "-questions.csv"))
+  
+  questions
+    
+  out
 }
 
 ## overall
 question_data_by_mp(ethi_statements)
 
 ## for Privacy in Digital Government
-question_data_by_mp(ethi_statements %>% filter(number %in% c(96, 97)))
+question_data_by_mp(ethi_statements %>% filter(number %in% c(96, 97)), "privacy-in-digital-government")
+
+## for Cambridge Analytica
+question_data_by_mp(ethi_statements %>% filter(number %in% cambridge_analytica_meetings$ids), "cambridge-analytica")
 
 ## since 2018
-question_data_by_mp(ethi_statements %>% filter(date > "2018-01-01"))
+question_data_by_mp(ethi_statements %>% filter(date > "2018-01-29"), "since-2018-01-29")
 
 
 wordcloud(words = ethi_statements$content_en_plaintext, max.words = 100)

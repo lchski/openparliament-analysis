@@ -48,3 +48,5 @@ Tables of interest:
 So, we can get all the statements for ETHI meetings by connecting `hansards_statement.document_id` to `committees_committeemeeting.evidence_id`.
 
 Look also into "activities" (e.g. reports): `committees_committeeactivity`, `committees_committeemeeting_activities`
+
+
