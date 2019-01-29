@@ -1,5 +1,6 @@
 library(tidyverse)
 library(textclean)
+library(wordcloud)
 
 mps <- read_tsv("data/mps.tsv")
 
@@ -49,13 +50,15 @@ ethi_mps <- mps %>% filter(id %in% ethi_mp_ids) %>% filter(! is.na(id))
 ethi_statements_dig_gov_priv <- ethi_statements %>% filter(number %in% c(96, 97))
 
 # count of questions by MP
-ethi_statements %>% filter(
+question_data_by_mp <- function(queried_statements) {
+  queried_statements %>% filter(
     ! procedural,
     ! is.na(member_id),
     str_detect(content_en_plaintext, "\\?")
   ) %>%
-  group_by(member_id) %>%
-  summarize(count = n(), avg = count / (ethi_statements %>% select(number) %>% unique() %>% count() %>% pull())) %>%
-  inner_join(ethi_mps, by = c("member_id" = "id")) %>%
-  select(member_id, name, short_name_en, count, avg) %>%
-  arrange(-avg)
+    group_by(member_id) %>%
+    summarize(count = n(), avg = count / (queried_statements %>% select(number) %>% unique() %>% count() %>% pull())) %>%
+    inner_join(ethi_mps, by = c("member_id" = "id")) %>%
+    select(member_id, name, short_name_en, count, avg) %>%
+    arrange(-avg)
+}
