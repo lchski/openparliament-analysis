@@ -71,4 +71,6 @@ question_data_by_mp(ethi_statements %>% filter(number %in% c(96, 97)))
 
 ## since 2018
 question_data_by_mp(ethi_statements %>% filter(date > "2018-01-01"))
-                    
+
+
+wordcloud(words = ethi_statements$content_en_plaintext, max.words = 100)
