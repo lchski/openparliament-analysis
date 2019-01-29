@@ -62,3 +62,13 @@ question_data_by_mp <- function(queried_statements) {
     select(member_id, name, short_name_en, count, avg) %>%
     arrange(-avg)
 }
+
+## overall
+question_data_by_mp(ethi_statements)
+
+## for Privacy in Digital Government
+question_data_by_mp(ethi_statements %>% filter(number %in% c(96, 97)))
+
+## since 2018
+question_data_by_mp(ethi_statements %>% filter(date > "2018-01-01"))
+                    
