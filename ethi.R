@@ -1,6 +1,8 @@
 library(tidyverse)
 library(textclean)
 
+mps <- read_tsv("data/mps.tsv")
+
 statements <- read_tsv("data/42-1-ethi.tsv")
 
 #statements <- statements %>%
