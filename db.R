@@ -28,3 +28,7 @@ db_ethi_statements <- tbl(con, "hansards_statement") %>%
     urlcache
   )
   
+
+db_mps <- tbl(con, "core_electedmember") %>%
+  right_join(tbl(con, "core_party"), by = c("party_id" = "id")) %>%
+  right_join(tbl(con, "core_politician"), by = c("politician_id" = "id"))
