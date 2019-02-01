@@ -13,8 +13,6 @@ con <- DBI::dbConnect(
     dbname = "openparliament"
   )
 
-cambridge_analytica_meetings <- read_csv("data/cambridge-analytica.csv")
-
 ethi_statements <- tbl(con, "hansards_statement") %>%
   left_join(tbl(con, "committees_committeemeeting"), by = c("document_id" = "evidence_id")) %>%
   filter(committee_id == 56 & session_id == "42-1") %>%
@@ -54,9 +52,6 @@ ethi_mps <- tbl(con, "core_electedmember") %>%
     )
   )
 
-# just statements from ETHI meetings 96 and 97, on the Privacy in Digital Government Report
-ethi_statements_dig_gov_priv <- ethi_statements %>% filter(number %in% c(96, 97))
-
 # count of questions by MP
 question_data_by_mp <- function(queried_statements, filename = "out") {
   number_of_meetings <- (queried_statements %>% select(number) %>% unique() %>% count() %>% pull())
@@ -88,11 +83,8 @@ question_data_by_mp <- function(queried_statements, filename = "out") {
 ## overall
 question_data_by_mp(ethi_statements)
 
-## for Privacy in Digital Government
+# just statements from ETHI meetings 96 and 97, on the Privacy in Digital Government Report
 question_data_by_mp(ethi_statements %>% filter(number %in% c(96, 97)), "privacy-in-digital-government")
-
-## for Cambridge Analytica
-question_data_by_mp(ethi_statements %>% filter(number %in% cambridge_analytica_meetings$ids), "cambridge-analytica")
 
 ## since 2018
 question_data_by_mp(ethi_statements %>% filter(date > "2018-01-29"), "since-2018-01-29")
