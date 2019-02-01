@@ -1,44 +1,58 @@
 library(tidyverse)
 library(textclean)
+
+library(RPostgreSQL)
+library(DBI)
+library(dbplyr)
+
 library(wordcloud)
 
-mps <- read_tsv("data/mps.tsv")
-
-statements <- read_tsv("data/42-1-ethi.tsv")
+con <- DBI::dbConnect(
+    drv = dbDriver("PostgreSQL"),
+    host = "localhost",
+    dbname = "openparliament"
+  )
 
 cambridge_analytica_meetings <- read_csv("data/cambridge-analytica.csv")
 
-statements <- statements %>%
-  rename(committee_meeting_id = id_1) %>%
-  arrange(number, sequence)
-
-ethi_statements <- statements %>%
-  mutate(
-    content_en_plaintext = replace_html(content_en)
-  ) %>%
+ethi_statements <- tbl(con, "hansards_statement") %>%
+  left_join(tbl(con, "committees_committeemeeting"), by = c("document_id" = "evidence_id")) %>%
+  filter(committee_id == 56 & session_id == "42-1") %>%
   select(
     number,
     date,
     sequence,
-    id,
+    id = "id.x",
     time,
     slug,
     member_id,
     who_en,
     who_context_en,
     politician_id,
-    content_en_plaintext,
+    content_en,
     statement_type,
     procedural,
     written_question,
     wordcount,
     urlcache
+  ) %>%
+  collect() %>%
+  mutate(
+    content_en_plaintext = replace_html(content_en)
   )
 
-ethi_mp_ids <- ethi_statements %>% select(member_id) %>% unique() %>% pull()
 
-ethi_mps <- mps %>% filter(id %in% ethi_mp_ids) %>% filter(! is.na(id))
-
+ethi_mps <- tbl(con, "core_electedmember") %>%
+  right_join(tbl(con, "core_party"), by = c("party_id" = "id")) %>%
+  right_join(tbl(con, "core_politician"), by = c("politician_id" = "id")) %>%
+  collect() %>%
+  filter(! is.na(id) & id %in% (
+      ethi_statements %>%
+        select(member_id) %>%
+        unique() %>%
+        pull()
+    )
+  )
 
 # just statements from ETHI meetings 96 and 97, on the Privacy in Digital Government Report
 ethi_statements_dig_gov_priv <- ethi_statements %>% filter(number %in% c(96, 97))
