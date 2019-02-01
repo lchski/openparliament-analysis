@@ -38,3 +38,14 @@ ethi_statements <- db_ethi_statements %>%
 db_mps <- tbl(con, "core_electedmember") %>%
   right_join(tbl(con, "core_party"), by = c("party_id" = "id")) %>%
   right_join(tbl(con, "core_politician"), by = c("politician_id" = "id"))
+
+
+ethi_mps <- db_mps %>%
+  collect() %>%
+  filter(! is.na(id) & id %in% (
+    ethi_statements %>%
+      select(member_id) %>%
+      unique() %>%
+      pull()
+    )
+  )
