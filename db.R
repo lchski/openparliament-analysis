@@ -27,6 +27,12 @@ db_ethi_statements <- tbl(con, "hansards_statement") %>%
     wordcount,
     urlcache
   )
+
+ethi_statements <- db_ethi_statements %>%
+  collect() %>%
+  mutate(
+    content_en_plaintext = replace_html(content_en)
+  )
   
 
 db_mps <- tbl(con, "core_electedmember") %>%
