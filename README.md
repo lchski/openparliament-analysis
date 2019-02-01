@@ -1,14 +1,16 @@
+# Getting the data
+
+## Load database
+
+prep:
+[install postgres]
+[load openparliament data dump into postgresql in a db named openparliament]
+
+## ETHI statements
 
 ETHI committee ID is 56.
 
-Sessions 96 and 97 the only two with Privacy of Digital Government Services on the agenda.
-
 Get all statements from ETHI in session 42-1:
-
-```
-SELECT * from hansards_statement
-  WHERE urlcache LIKE '/committees/ethics/42-1/%';
-```
 
 ```
 SELECT * FROM hansards_statement
@@ -17,16 +19,6 @@ SELECT * FROM hansards_statement
   WHERE
     (committee_id = 56) AND
     (session_id = '42-1');
-```
-
-Get MP data:
-
-```
-SELECT * FROM core_electedmember
-  RIGHT JOIN core_party
-    ON core_electedmember.party_id = core_party.id
-  RIGHT JOIN core_politician
-    ON core_electedmember.politician_id = core_politician.id;
 ```
 
 Get all ETHI meetings in session 42-1:
@@ -50,15 +42,14 @@ So, we can get all the statements for ETHI meetings by connecting `hansards_stat
 Look also into "activities" (e.g. reports): `committees_committeeactivity`, `committees_committeemeeting_activities`
 
 
+## MPs
 
-
-prep:
-[install postgres]
-[load openparliament data dump into postgresql in a db named openparliament]
+Get MP data:
 
 ```
-brew install psqlodbc
+SELECT * FROM core_electedmember
+  RIGHT JOIN core_party
+    ON core_electedmember.party_id = core_party.id
+  RIGHT JOIN core_politician
+    ON core_electedmember.politician_id = core_politician.id;
 ```
-
-install.packages("DBI")
-install.packages("odbc")
