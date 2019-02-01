@@ -50,3 +50,15 @@ So, we can get all the statements for ETHI meetings by connecting `hansards_stat
 Look also into "activities" (e.g. reports): `committees_committeeactivity`, `committees_committeemeeting_activities`
 
 
+
+
+prep:
+[install postgres]
+[load openparliament data dump into postgresql in a db named openparliament]
+
+```
+brew install psqlodbc
+```
+
+install.packages("DBI")
+install.packages("odbc")
