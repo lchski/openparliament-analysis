@@ -1,3 +1,16 @@
+# Narrative
+
+Someone approached me about a parliamentary committee. They had a few questions, about this committee in general and for specific meetings (tied to a particular topic or in a date range):
+
+* Who asks questions on this committee?
+* What questions do they ask?
+
+So I downloaded [Open Parliament’s database of Hansard](https://openparliament.ca/data-download/) (the official record of Parliament, including committees). With that database, I cobbled together some SQL queries that pulled all the statements for that committee into a TSV.
+
+Next, I wrote an R script that you can feed a date range, or a set of committee numbers, or other filters, that returns two CSVs: one with a list of who asks questions, ranked by # of questions; another that lists their questions.
+
+I then decided it was still too onerous a process to manually run the SQL and make it into a TSV, so I rejigged the R script a bit. It now loads the data directly from the database. Other than increasing this script’s reproducibility, you can now also point this script toward any Canadian parliamentary committee—you just need to tweak the script’s opening query.
+
 # Getting the data
 
 ## Load database
