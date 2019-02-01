@@ -33,7 +33,7 @@ ethi_statements <- db_ethi_statements %>%
   mutate(
     content_en_plaintext = replace_html(content_en)
   )
-  
+
 
 db_mps <- tbl(con, "core_electedmember") %>%
   right_join(tbl(con, "core_party"), by = c("party_id" = "id")) %>%

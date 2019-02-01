@@ -8,14 +8,6 @@ statements <- read_tsv("data/42-1-ethi.tsv")
 
 cambridge_analytica_meetings <- read_csv("data/cambridge-analytica.csv")
 
-#statements <- statements %>%
-#  mutate(
-#    meeting_number = str_extract_all(urlcache, "/committees/ethics/42-1/([0-9]{1,3})/"),
-#    meeting_number = str_replace(meeting_number, "/committees/ethics/42-1/", ""),
-#    meeting_number = str_replace(meeting_number, "/", ""),
-#    meeting_number = as.numeric(meeting_number)
-#  )
-
 statements <- statements %>%
   rename(committee_meeting_id = id_1) %>%
   arrange(number, sequence)
