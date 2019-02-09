@@ -90,4 +90,4 @@ question_data_by_mp(ethi_statements %>% filter(number %in% c(96, 97)), "privacy-
 question_data_by_mp(ethi_statements %>% filter(date > "2018-01-29"), "since-2018-01-29")
 
 
-wordcloud(words = ethi_statements$content_en_plaintext, max.words = 100)
+# wordcloud(words = ethi_statements$content_en_plaintext, max.words = 100)
