@@ -25,17 +25,28 @@ speeches_lda <- LDA(speeches_dtm, k = 10, control = list(seed = 1))
 
 speeches_lda_td <- tidy(speeches_lda)
 
+terms_by_topic <- speeches_lda_td %>%
+  group_by(topic) %>%
+  top_n(20, beta) %>%
+  ungroup() %>%
+  arrange(topic, -beta) %>%
+  group_by(topic) %>%
+  summarize(terms = paste(term, collapse=" "))
+
 ## how to make a "grouped" facet: https://drsimonj.svbtle.com/ordering-categories-within-ggplot2-facets
 top_terms_ordered <- speeches_lda_td %>%
   group_by(topic) %>%
   top_n(5, beta) %>%
   ungroup() %>%
   arrange(topic, beta) %>%
-  mutate(order = row_number())
+  mutate(order = row_number()) %>%
+  inner_join(terms_by_topic, by = c("topic" = "topic")) %>%
+  mutate(topic = paste(topic, terms)) %>%
+  select(topic, term, beta, order)
 
 top_terms_ordered %>% ggplot(aes(order, beta)) +
   geom_bar(stat = "identity") +
-  facet_wrap(~ topic, scales = "free_y") +
+  facet_wrap(~ topic, scales = "free_y", ncol = 2) +
   xlab("Term") +
   ylab("Beta (term weight)") +
   theme_bw() +
@@ -44,12 +55,5 @@ top_terms_ordered %>% ggplot(aes(order, beta)) +
     labels = top_terms_ordered$term,
     expand = c(0,0)
   ) +
-  coord_flip()
-
-terms_by_topic <- speeches_lda_td %>%
-  group_by(topic) %>%
-  top_n(20, beta) %>%
-  ungroup() %>%
-  arrange(topic, -beta) %>%
-  group_by(topic) %>%
-  summarize(terms = paste(term, collapse=" "))
+  coord_flip() +
+  theme(strip.text = element_text(hjust = 0))
